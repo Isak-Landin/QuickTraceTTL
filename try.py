@@ -8,7 +8,8 @@ def traceroute_scapy(target, max_hops=30):
         reply = sr1(pkt, timeout=20, verbose=0)
 
         if reply is None:
-            print(f"{i}. No reply")
+            if i > 200:
+                print(f"{i}. No reply")
             continue
 
         if reply.haslayer(ICMP):
@@ -20,7 +21,7 @@ def traceroute_scapy(target, max_hops=30):
         else:
             print(f"{i}. Unexpected reply from {reply.src}")
 
-def run_multiple_traceroutes(target, num_threads=100):
+def run_multiple_traceroutes(target, num_threads=1000):
     threads = []
 
     for _ in range(num_threads):

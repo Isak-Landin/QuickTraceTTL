@@ -2,7 +2,7 @@ from scapy.all import *
 from scapy.layers.inet import IP, UDP, ICMP
 
 
-def traceroute_scapy(target, max_hops=30, to_print_all=False):
+def traceroute_scapy(target, max_hops=255, to_print_all=False):
     for i in range(1, max_hops+1):
         pkt = IP(dst=target, ttl=i) / ICMP()
         reply = sr1(pkt, timeout=20, verbose=0)

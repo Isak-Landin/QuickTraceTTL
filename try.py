@@ -2,24 +2,26 @@ from scapy.all import *
 from scapy.layers.inet import IP, UDP, ICMP
 
 
-def traceroute_scapy(target, max_hops=30):
+def traceroute_scapy(target, max_hops=30, to_print_all=False):
     for i in range(1, max_hops+1):
-        pkt = IP(dst=target, ttl=i) / UDP(dport=33434)
+        pkt = IP(dst=target, ttl=i) / ICMP()
         reply = sr1(pkt, timeout=20, verbose=0)
 
         if reply is None:
-            if i > 200:
+            if to_print_all:
                 print(f"{i}. No reply")
             continue
 
         if reply.haslayer(ICMP):
-            if reply[ICMP].type == 11:  # ICMP Time Exceeded
+            if reply[ICMP].type == 11 and to_print_all:  # ICMP Time Exceeded
                 print(f"{i}. Hop: {reply.src}")
-            elif reply[ICMP].type == 3:  # ICMP Destination Unreachable
-                print(f"{i}. Destination {reply.src} reached")
+            elif reply[ICMP].type == 0:  # ICMP Echo Reply
+                print(f"{i}. Destination {reply.src} reached with Echo Reply")
                 break
         else:
             print(f"{i}. Unexpected reply from {reply.src}")
+
+        time.sleep(0.1)  # Introduce a slight delay
 
 def run_multiple_traceroutes(target, num_threads=1000):
     threads = []
